@@ -1,0 +1,352 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertiBlock - Certificación Blockchain</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="{% static 'img/seguridad.png' %}" type="image/png" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="logo">
+          <i class="fas fa-shield-alt"></i>
+          <span>CertiBlock</span>
+        </div>
+        <nav class="nav">
+          <a href="#home" class="nav-link active">Inicio</a>
+          <a href="#upload" class="nav-link">Certificar</a>
+          <a href="#verify" class="nav-link">Verificar</a>
+        </nav>
+        <div class="wallet-info">
+          <i class="fas fa-wallet"></i>
+          <span>0x1234...5678</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Certificación de documentos en Blockchain</h1>
+          <p>
+            Protege la autenticidad de tus documentos con tecnología blockchain.
+            Certifica, verifica y confía.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="showSection('upload')">
+              <i class="fas fa-upload"></i>
+              Certificar documento
+            </button>
+            <button class="btn btn-secondary" onclick="showSection('verify')">
+              <i class="fas fa-search"></i>
+              Verificar documento
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="blockchain-visual">
+            <div class="block"></div>
+            <div class="block"></div>
+            <div class="block"></div>
+            <div class="connection"></div>
+            <div class="connection"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Certificar documento -->
+    <section id="upload" class="section upload-section">
+      <div class="container">
+        <h2><i class="fas fa-certificate"></i> Certificar documento</h2>
+        <div class="upload-container">
+          <div class="upload-area">
+            <form
+              id="uploadForm"
+              method="post"
+              enctype="multipart/form-data"
+              action="{% url 'upload_document' %}"
+            >
+              {% csrf_token %}
+              <div class="upload-zone" id="uploadZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Arrastra tu documento aquí</h3>
+                <p>o haz clic para seleccionar</p>
+                <input
+                  type="file"
+                  name="document"
+                  id="fileInput"
+                  accept=".pdf,.jpg,.jpeg,.png,.docx"
+                  required
+                />
+                <div class="supported-formats">
+                  <span>Formatos soportados: PDF, JPG, PNG, DOCX</span>
+                </div>
+              </div>
+
+              <div class="file-preview" id="filePreview">
+                <h4>Archivo seleccionado:</h4>
+                <div class="file-details">
+                  <i class="fas fa-file"></i>
+                  <div>
+                    <span class="file-name" id="fileName"></span>
+                    <span class="file-size" id="fileSize"></span>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="certifyBtn">
+                  <i class="fas fa-shield-alt"></i>
+                  Certificar documento
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="upload-info">
+            <div class="info-card">
+              <h4><i class="fas fa-info-circle"></i> ¿Cómo funciona?</h4>
+              <ol>
+                <li>Sube tu documento</li>
+                <li>Generamos un hash SHA-256</li>
+                <li>Registramos en blockchain Sepolia</li>
+                <li>Recibes tu certificado digital</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div id="certificationResult"></div>
+      </div>
+    </section>
+
+    <!-- Verificar documento -->
+<section id="verify" class="section verify-section">
+  <div class="container">
+    <h2><i class="fas fa-search"></i> Verificar documento</h2>
+    <div class="verify-container">
+      <form
+        id="verifyForm"
+        method="post"
+        enctype="multipart/form-data"
+        action="{% url 'verify_document' %}"
+      >
+        {% csrf_token %}
+        <div class="verify-form">
+          <div class="form-group">
+            <label>1. Sube el documento a verificar</label>
+            <div class="upload-zone small">
+              <i class="fas fa-file-upload"></i>
+              <span>Seleccionar archivo</span>
+              <input
+                type="file"
+                name="document"
+                id="verifyFileInput"
+                required
+              />
+            </div>
+
+            <!-- AQUI VA EL BLOQUE DE PREVIEW -->
+            <div class="file-preview" id="verifyPreview" style="display: none;">
+              <h4>Archivo seleccionado:</h4>
+              <div class="file-details">
+                <i class="fas fa-file"></i>
+                <div>
+                  <span class="file-name" id="verifyFileName">-</span>
+                  <span class="file-size" id="verifyFileSize">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>2. Ingresa el hash de la transacción</label>
+            <input
+              type="text"
+              name="tx_hash"
+              class="form-input"
+              placeholder="0x1234567890abcdef..."
+              id="txHashInput"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary verify-btn"
+            id="verifyBtn"
+          >
+            <i class="fas fa-check-circle"></i>
+            Verificar autenticidad
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+
+    <!-- Modal de certificado -->
+    <div class="modal" id="certificateModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-certificate"></i> Certificado digital</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="certificate">
+          <div class="certificate-header">
+            <h2>CERTIFICADO DE AUTENTICIDAD</h2>
+            <p>Blockchain Certificate</p>
+          </div>
+          <div class="certificate-body">
+            <div class="cert-field">
+              <label>Nombre del archivo:</label>
+              <span id="cert-filename">-</span>
+            </div>
+            <div class="cert-field">
+              <label>Hash SHA-256:</label>
+              <code id="cert-filehash">-</code>
+            </div>
+            <div class="cert-field">
+              <label>Fecha y hora:</label>
+              <span id="cert-fecha">-</span>
+            </div>
+            <div class="cert-field">
+              <label>Dirección de la cartera:</label>
+              <code id="cert-wallet">-</code>
+            </div>
+            <div class="cert-field">
+              <label>Hash de transacción:</label>
+              <a id="cert-txhash" href="#" target="_blank">-</a>
+            </div>
+          </div>
+          <div class="certificate-footer">
+            <p>
+              Este certificado es válido y verificable en la blockchain de
+              Ethereum (Sepolia)
+            </p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="downloadCertBtn">
+            <i class="fas fa-download"></i>
+            Descargar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de carga durante verificación -->
+    <div class="verify-modal" id="verifyLoadingModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="fas fa-spinner fa-spin"></i> Verificando documento...
+          </h3>
+        </div>
+        <div class="certificate-body">
+          <p>
+            Por favor espera mientras validamos tu documento en la blockchain.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de verificación de exito-->
+    <div class="modal" id="verifyModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-search"></i> Resultado de verificación</h3>
+          <button class="close-btn" onclick="closeVerifyModal()">
+            &times;
+          </button>
+        </div>
+        <div class="certificate">
+          <div class="certificate-header">
+            <h2 id="verify-status">Verificando...</h2>
+          </div>
+          <div class="certificate-body">
+            <div class="cert-field">
+              <label>Hash calculado:</label>
+              <code id="verify-filehash">-</code>
+            </div>
+            <div class="cert-field">
+              <label>Hash en blockchain:</label>
+              <code id="verify-blockchainhash">-</code>
+            </div>
+            <div class="cert-field">
+              <label>Fecha de certificación:</label>
+              <span id="verify-date">-</span>
+            </div>
+            <div class="cert-field">
+              <label>Transacción:</label>
+              <a id="verify-txhash" href="#" target="_blank">-</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de carga blockchain -->
+    <div id="blockchainLoadingModal" class="blockchain-modal">
+      <div class="blockchain-modal-content">
+        <h2><i class="fas fa-link"></i> Validando en Blockchain</h2>
+        <p>Estamos registrando tu documento en la red Sepolia</p>
+        <div class="blockchain-nodes" id="blockchainNodes">
+          <i class="fas fa-server blockchain-node-icon" title="Nodo 1"></i>
+          <i
+            class="fas fa-network-wired blockchain-node-icon"
+            title="Nodo 2"
+          ></i>
+          <i class="fas fa-lock blockchain-node-icon" title="Encriptación"></i>
+          <i
+            class="fas fa-code-branch blockchain-node-icon"
+            title="Consenso"
+          ></i>
+          <i
+            class="fas fa-check-circle blockchain-node-icon"
+            title="Confirmación"
+          ></i>
+        </div>
+        <div class="progress-text">Procesando transacción...</div>
+      </div>
+    </div>
+
+    <div id="blockchainSuccessModal" class="blockchain-modal">
+      <div class="blockchain-modal-content">
+        <button
+          class="blockchain-close-btn"
+          onclick="closeBlockchainSuccessModal()"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="blockchain-success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>¡Documento certificado!</h2>
+        <p class="blockchain-success-msg">
+          Tu documento ha sido registrado en la blockchain
+        </p>
+        <p>Transacción confirmada en la red Sepolia.</p>
+        <button class="btn btn-primary" onclick="closeBlockchainSuccessModal()">
+          <i class="fas fa-thumbs-up"></i> Entendido
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const uploadUrl = "{% url 'upload_document' %}";
+      const verifyUrl = "{% url 'verify_document' %}";
+      const csrfToken = "{{ csrf_token }}";
+    </script>
+
+    <script src="{% static 'script.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  </body>
+</html>
